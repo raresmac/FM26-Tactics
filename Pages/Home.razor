@@ -1,0 +1,40 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app. <br />
+
+<BitButton OnClick="() => publicApiPdfReaderRef!.First()">First</BitButton>
+<BitButton OnClick="() => publicApiPdfReaderRef!.Prev()">Prev</BitButton>
+<BitTag Variant="BitVariant.Outline" Text="@($"{publicApiPdfReaderRef?.CurrentPageNumber.ToString()}/{publicApiPdfReaderRef?.NumberOfPages.ToString()}")" Color="BitColor.Info" />
+<BitButton OnClick="() => publicApiPdfReaderRef!.Next()">Next</BitButton>
+<BitButton OnClick="() => publicApiPdfReaderRef!.Last()">Last</BitButton>
+<BitButton OnClick="ZoomOut">Zoom -</BitButton>
+<BitButton OnClick="ZoomIn">Zoom +</BitButton>
+
+<BitPdfReader @ref="publicApiPdfReaderRef" Config="publicApiConfig" />
+
+@code {
+	private double scale = 1;
+	private BitPdfReader publicApiPdfReaderRef = default!;
+	private BitPdfReaderConfig publicApiConfig = new() { Url = "/docs/keyboard.pdf" };
+
+	private async Task ZoomIn()
+	{
+		scale += 0.25;
+		publicApiConfig.Scale = scale;
+		await publicApiPdfReaderRef.Refresh();
+	}
+
+	private async Task ZoomOut()
+	{
+		if (scale > 0.25)
+		{
+			scale -= 0.25;
+		}
+		publicApiConfig.Scale = scale;
+		await publicApiPdfReaderRef.Refresh();
+	}
+}
