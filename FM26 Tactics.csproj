@@ -5,11 +5,9 @@
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
-	<StaticWebAssetBasePath>/FM26-Tactics/</StaticWebAssetBasePath>
 	<EmulateStaticFilesFromBasePath>true</EmulateStaticFilesFromBasePath>
 	<GHPages>true</GHPages>
 	<RepositoryType>git</RepositoryType>
-	<RootNamespace>raresmac.FM26-Tactics</RootNamespace>
 	<Version>0.4.0</Version>
 	<Authors>raresmac</Authors>
 	<Description>The best tactics for FM26, all original and never before seen.</Description>

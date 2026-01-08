@@ -1,4 +1,4 @@
-using raresmac.FM26_Tactics;
+using FM26_Tactics;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
