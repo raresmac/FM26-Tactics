@@ -21,7 +21,7 @@
         @foreach (var tactic in TacticService.GetTacticsByFormation(FormationName))
         {
             <div class="col-md-6 col-lg-4">
-                <div class="tactic-card" @onclick='() => NavManager.NavigateTo($"/{FormationName}/{tactic.Slug}")' style="cursor:pointer">
+                <div class="tactic-card" @onclick='() => NavManager.NavigateTo($"{FormationName}/{tactic.Slug}")' style="cursor:pointer">
                     <div class="tactic-image-container">
                         <img src="@tactic.ImagePath" alt="@tactic.Title" class="tactic-img" />
                     </div>
