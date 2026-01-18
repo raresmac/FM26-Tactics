@@ -1,0 +1,821 @@
+﻿@page "/{FormationName}/{TacticName}"
+@using FM26_Tactics.Models
+@using FM26_Tactics.Services
+@inject TacticService TacticService
+@inject NavigationManager NavManager
+
+@if (tactic == null)
+{
+    <PageTitle>Tactic Not Found - FM26 Tactics</PageTitle>
+    <div class="container mt-5 text-center">
+        <h2 class="text-white">Scouting report not found...</h2>
+        <a href="/" class="btn btn-outline-cyan">Return Hub</a>
+    </div>
+}
+else
+{
+    <PageTitle>@tactic.Title @tactic.Formation - FM26 Tactics Hub</PageTitle>
+
+    <!-- PAGE TIMELINE SIDEBAR -->
+    <div class="timeline-sidebar">
+        <div class="timeline-track"></div>
+        <a href="@NavManager.Uri#tactics-section" class="timeline-node" title="Tactics">
+            <div class="node-dot"></div>
+            <span class="node-label">Tactics</span>
+        </a>
+        <a href="@NavManager.Uri#results-section" class="timeline-node" title="Results">
+            <div class="node-dot"></div>
+            <span class="node-label">Results</span>
+        </a>
+        <a href="@NavManager.Uri#downloads-section" class="timeline-node" title="Downloads">
+            <div class="node-dot"></div>
+            <span class="node-label">Files</span>
+        </a>
+    </div>
+
+    <div class="container-fluid mt-4 px-lg-4 pb-5">
+        <div class="main-layout-offset">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-4 custom-breadcrumb ms-2">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/@FormationName">@FormationName</a></li>
+                    <li class="breadcrumb-item active">@tactic.Title</li>
+                </ol>
+            </nav>
+
+            <!-- Phase Selector -->
+            <div class="d-flex justify-content-center mb-4">
+                <div class="phase-toggle-large shadow-lg">
+                    <button class='toggle-btn @(currentView == "IP" ? "active" : "")' @onclick='() => SetView("IP")'>In Possession</button>
+                    <button class='toggle-btn @(currentView == "OOP" ? "active" : "")' @onclick='() => SetView("OOP")'>Out of Possession</button>
+                    <button class='toggle-btn @(currentView == "Both" ? "active" : "")' @onclick='() => SetView("Both")'>Both Phases</button>
+                </div>
+            </div>
+
+            <div id="tactics-section" class="row g-3 align-items-stretch">
+                <!-- TACTIC BOARD -->
+                <div class="col-xl-7 col-lg-7">
+                    <div class="tactic-board-container shadow-lg unified-panel-height @(currentView == "Both" ? "mb-5" : "mb-3")">
+                        <div class="board-header d-flex justify-content-center align-items-center">
+                            <h2 class="m-0 text-uppercase fw-black header-font text-center mt-3 mb-4">@tactic.Title <span class="text-cyan">Board</span></h2>
+                        </div>
+
+                        <div class="board-content d-flex flex-fill">
+                            @if (currentView == "Both")
+                            {
+                                <div class="pitch-side p-2 d-flex gap-3 justify-content-center align-items-center w-100 bg-dark-pitch flex-fill">
+                                    <div class="mini-pitch-box flex-grow-1">
+                                        <h6 class="text-cyan text-center text-uppercase fw-bold mb-2 label-font">In Possession</h6>
+                                        @RenderPitch(tactic.InPossessionRoles, "overview", "cyan")
+                                    </div>
+                                    <div class="mini-pitch-box flex-grow-1">
+                                        <h6 class="text-danger text-center text-uppercase fw-bold mb-2 label-font">Out of Possession</h6>
+                                        @RenderPitch(tactic.OutOfPossessionRoles, "overview", "danger")
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="pitch-side p-3 bg-dark-pitch flex-grow-1 d-flex align-items-center justify-content-center">
+                                    @RenderPitch(currentView == "IP" ? tactic.InPossessionRoles : tactic.OutOfPossessionRoles, activeCategory, currentView == "IP" ? "cyan" : "danger")
+                                </div>
+
+                                <div class="category-side p-3">
+                                    <h5 class="text-uppercase fw-bold text-muted label-font mb-3 text-center">Phases</h5>
+                                    <div class="category-list">
+                                        @foreach (var cat in AvailableCategories)
+                                        {
+                                            <button class="cat-item @(activeCategory == cat ? "active" : "")" @onclick="() => activeCategory = cat">
+                                                <div class="cat-indicator"></div>
+                                                <span>@cat</span>
+                                            </button>
+                                        }
+                                        <div class="mt-auto pt-2 border-top border-secondary border-opacity-10">
+                                            <button class="cat-item w-100 @(activeCategory == "All Instructions" ? "active" : "")" @onclick='() => activeCategory = "All Instructions"'>
+                                                <div class="cat-indicator"></div>
+                                                <span>All Instructions</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INSTRUCTIONS COLUMN -->
+                <div class="col-xl-5 col-lg-5">
+                    <div class="instructions-panel p-3 shadow-lg unified-panel-height">
+                        <div class="instruction-header mb-3 d-flex justify-content-center align-items-center mt-2">
+                            <h3 class="text-cyan fw-bold text-uppercase header-font m-0 text-center">@activeCategory</h3>
+                        </div>
+
+                        <div class="instruction-scroll-area">
+                            @if (currentView == "Both")
+                            {
+                                <h6 class="text-cyan fw-bold text-uppercase mb-2 label-font">In Possession Phase</h6>
+                                <div class="instruction-grid-three-col mb-4">
+                                    @foreach (var instr in tactic.InPossessionInstructions)
+                                    {
+                                        <div class="instruction-card-compact border-left-cyan"><div class="label">@instr.Key</div><div class="value">@instr.Value</div></div>
+                                    }
+                                </div>
+                                <h6 class="text-danger fw-bold text-uppercase mb-2 label-font">Out of Possession Phase</h6>
+                                <div class="instruction-grid-three-col">
+                                    @foreach (var instr in tactic.OutOfPossessionInstructions)
+                                    {
+                                        <div class="instruction-card-compact border-left-danger"><div class="label">@instr.Key</div><div class="value">@instr.Value</div></div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="instruction-grid-three-col">
+                                    @foreach (var instruction in GetFilteredInstructions())
+                                    {
+                                        <div class="instruction-card-compact @(currentView == "IP" ? "border-left-cyan" : "border-left-danger")">
+                                            <div class="label">@instruction.Key</div>
+                                            <div class="value">@instruction.Value</div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTS SECTION -->
+            <div id="results-section" class="row mt-4 pt-4">
+                <div class="col-12">
+                    <div class="results-container shadow-lg p-4">
+                        <div class="d-flex flex-column align-items-center mb-4">
+                            <h2 class="m-0 text-uppercase fw-black header-font text-center"><i class="bi bi-trophy-fill text-gold me-2"></i>Testing <span class="text-gold">Records</span></h2>
+                            <div class="test-tabs mt-3">
+                                @foreach (var testTeam in tactic.TestResults.Keys)
+                                {
+                                    <button class="test-tab-btn @(activeTest == testTeam ? "active" : "")" @onclick="() => activeTest = testTeam">@testTeam</button>
+                                }
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-dark custom-fm-table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Pos</th>
+                                        <th>Team</th>
+                                        <th class="text-center">Pld</th>
+                                        <th class="text-center">Won</th>
+                                        <th class="text-center">Drn</th>
+                                        <th class="text-center">Lst</th>
+                                        <th class="text-center">For</th>
+                                        <th class="text-center">xG</th>
+                                        <th class="text-center">Ag</th>
+                                        <th class="text-center">xGA</th>
+                                        <th class="text-center">GD</th>
+                                        <th class="text-center">xGD</th>
+                                        <th class="text-center">Pts</th>
+                                        <th class="text-center">XPTS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var entry in tactic.TestResults[activeTest])
+                                    {
+                                        <tr class="@(entry.TeamName == activeTest ? "highlight-tested-team-active" : "")">
+                                            <td class="text-center fw-bold">@entry.Position</td>
+                                            <td class="fw-bold">@entry.TeamName</td>
+                                            <td class="text-center">@entry.Pld</td>
+                                            <td class="text-center text-emerald fw-bold">@entry.Won</td>
+                                            <td class="text-center">@entry.Drn</td>
+                                            <td class="text-center text-danger fw-bold">@entry.Lst</td>
+                                            <td class="text-center text-emerald">@entry.For</td>
+                                            <td class="text-center text-emerald">@entry.xG.ToString("F1")</td>
+                                            <td class="text-center text-danger">@entry.Ag</td>
+                                            <td class="text-center text-danger">@entry.xGA.ToString("F1")</td>
+                                            <td class="text-center fw-bold">@entry.GD</td>
+                                            <td class="text-center">@entry.xGD.ToString("F1")</td>
+                                            <td class="text-center fw-black text-indigo">@entry.Pts</td>
+                                            <td class="text-center text-indigo">@entry.XPTS.ToString("F1")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOWNLOADS SECTION -->
+            <div id="downloads-section" class="row mt-4 pt-4">
+                <div class="col-12">
+                    <div class="results-container p-4 d-flex justify-content-between align-items-center mb-5">
+                        <div>
+                            <h3 class="m-0 header-font text-uppercase fw-black">Tactic <span class="text-cyan">Files</span></h3>
+                            <p class="text-muted m-0 label-font">Download the official .fmf files for your @tactic.Formation setup.</p>
+                        </div>
+                        <a href="@tactic.DownloadUrl" class="btn btn-download-glow text-decoration-none">
+                            <i class="bi bi-file-earmark-arrow-down me-2"></i> Download @tactic.Title @tactic.Formation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string FormationName { get; set; }
+    [Parameter] public string TacticName { get; set; }
+
+    private Tactic tactic;
+    private string currentView = "IP";
+    private string activeCategory = "All Instructions";
+    private string activeTest = "";
+
+    protected override void OnParametersSet()
+    {
+        tactic = TacticService.GetTacticBySlug(TacticName);
+        if (tactic != null && tactic.TestResults.Any()) activeTest = tactic.TestResults.Keys.First();
+    }
+
+    private void SetView(string view) { currentView = view; activeCategory = "All Instructions"; }
+
+    private List<string> AvailableCategories => currentView == "IP"
+        ? new() { "Overview", "Buildup", "Progression", "Final Third" }
+        : new() { "Overview", "Low Block", "Mid Block", "High Press" };
+
+    private Dictionary<string, string> GetFilteredInstructions()
+    {
+        var all = currentView == "IP" ? tactic.InPossessionInstructions : tactic.OutOfPossessionInstructions;
+        if (activeCategory == "All Instructions") return all;
+
+        if (currentView == "IP")
+        {
+            var keys = activeCategory switch
+            {
+                "Overview" => new[] { "Passing Directness", "Tempo", "Attacking Width", "Attacking Transition", "Creative Freedom", "Time Wasting", "Play for Set Pieces" },
+                "Buildup" => new[] { "Build-up Strategy", "Goal Kicks", "GK Distribution (Speed)", "GK Distribution" },
+                "Progression" => new[] { "Supporting Runs", "Dribbling", "Progress Through", "Pass Reception" },
+                "Final Third" => new[] { "Dribbling", "Patience", "Shots from Distance", "Crossing Style" },
+                _ => Array.Empty<string>()
+            };
+            return all.Where(x => keys.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
+        }
+        else
+        {
+            var keys = activeCategory switch
+            {
+                "Overview" => new[] { "Line of Engagement", "Defensive Line", "Defensive Line Behaviour", "Trigger Press", "Defensive Transition", "Tackling" },
+                "Low Block" => new[] { "Cross Engagement" },
+                "Mid Block" => new[] { "Pressing Trap" },
+                "High Press" => new[] { "Pressing Trap", "Short Goalkeeper Distribution" },
+                _ => Array.Empty<string>()
+            };
+            return all.Where(x => keys.Contains(x.Key)).ToDictionary(x => x.Key, x => x.Value);
+        }
+    }
+
+    RenderFragment RenderPitch(List<PlayerRole> roles, string highlight, string themeColor) => __builder =>
+    {
+        <div class="football-pitch @themeColor">
+            <div class="pitch-highlight @(activeCategory == "All Instructions" ? "overview" : highlight.ToLower().Replace(" ", "-"))"></div>
+            <div class="pitch-lines"><div class="halfway-line"></div><div class="center-circle"></div><div class="penalty-area top"></div><div class="six-yard-box top"></div><div class="penalty-area bottom"></div><div class="six-yard-box bottom"></div></div>
+            @foreach (var player in roles)
+            {
+                string overlayClass = (player.Y > 70 || (player.Position == "MC" && currentView == "IP")) ? " flip-overlay" : "";
+                overlayClass += player.X < 50 ? " shift-right" : " shift-left";
+                <div class="player-icon @overlayClass" style="bottom: @player.Y%; left: @player.X%;">
+                    <div class="player-circle">@player.Role</div><div class="player-pos-label">@player.Position</div>
+                    <div class="player-instruction-overlay shadow-lg">
+                        <div class="overlay-header">@player.FullName</div>
+                        <div class="overlay-body scroll-instructions">
+                            <ul class="instr-list">@foreach (var pi in player.PlayerInstructions) {
+                            <li>@pi</li>
+                        }
+        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+</div>
+    };
+}
+
+<style>
+    /* TIMELINE */
+    .timeline-sidebar {
+        position: fixed;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .timeline-track {
+        position: absolute;
+        top: 10px;
+        bottom: 10px;
+        width: 2px;
+        background: rgba(0, 210, 255, 0.1);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: -1;
+    }
+
+    .timeline-node {
+        position: relative;
+        text-decoration: none !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 40px;
+    }
+
+    .node-dot {
+        width: 12px;
+        height: 12px;
+        background: #1e293b;
+        border: 2px solid #64748b;
+        border-radius: 50%;
+        transition: 0.3s;
+    }
+
+    .node-label {
+        position: absolute;
+        left: 45px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #00d2ff;
+        color: #0f172a;
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s;
+        white-space: nowrap;
+    }
+
+    .timeline-node:hover .node-dot {
+        background: #00d2ff;
+        border-color: #00d2ff;
+        box-shadow: 0 0 15px #00d2ff;
+        transform: scale(1.3);
+    }
+
+    .timeline-node:hover .node-label {
+        opacity: 1;
+        visibility: visible;
+        left: 55px;
+    }
+
+    /* LAYOUT & SCALING */
+    .main-layout-offset {
+        padding-left: 60px;
+    }
+
+    .custom-breadcrumb .breadcrumb-item a {
+        color: #00d2ff !important;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .custom-breadcrumb .breadcrumb-item.active {
+        color: #f8fafc !important;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .custom-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+        color: #94a3b8 !important;
+        content: "→";
+    }
+
+    .unified-panel-height {
+        height: 660px !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .header-font {
+        font-size: 1.35rem !important;
+    }
+
+    .label-font {
+        font-size: 1rem !important;
+    }
+
+    .fw-black {
+        font-weight: 900;
+    }
+
+    .text-cyan {
+        color: #00d2ff !important;
+    }
+
+    .text-gold {
+        color: #fbbf24 !important;
+    }
+
+    .text-indigo {
+        color: #a5b4fc !important;
+    }
+
+    .text-emerald {
+        color: #10b981 !important;
+    }
+
+    .phase-toggle-large {
+        background: #0f172a;
+        padding: 6px;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+        display: inline-flex;
+    }
+
+        .phase-toggle-large .toggle-btn {
+            padding: 10px 24px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 700;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+
+            .phase-toggle-large .toggle-btn.active {
+                background: #00d2ff;
+                color: #0f172a;
+                box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+            }
+
+    .tactic-board-container {
+        background: #1e293b;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+        overflow: visible;
+    }
+
+    .board-header {
+        background: rgba(0,0,0,0.2);
+        border-radius: 12px 12px 0 0;
+    }
+
+    .bg-dark-pitch {
+        background: #0f172a;
+        border-radius: 0 0 0 12px;
+    }
+
+    .football-pitch {
+        height: 480px;
+        width: 100%;
+        max-width: 340px;
+        background: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.2);
+        margin: auto;
+    }
+
+        .football-pitch.danger {
+            background: linear-gradient(135deg, #450a0a 0%, #1a0505 100%);
+        }
+
+    .pitch-lines div {
+        position: absolute;
+        border: 1px solid rgba(255,255,255,0.15);
+        pointer-events: none;
+    }
+
+    .halfway-line {
+        top: 50%;
+        width: 100%;
+    }
+
+    .center-circle {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+    }
+
+    .penalty-area.top {
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70%;
+        height: 12%;
+        border-top: 0;
+    }
+
+    .six-yard-box.top {
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30%;
+        height: 5%;
+        border-top: 0;
+    }
+
+    .penalty-area.bottom {
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70%;
+        height: 12%;
+        border-bottom: 0;
+    }
+
+    .six-yard-box.bottom {
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30%;
+        height: 5%;
+        border-bottom: 0;
+    }
+
+    .pitch-highlight {
+        position: absolute;
+        width: 100%;
+        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(0, 210, 255, 0.08);
+        border: 1px solid rgba(0,210,255,0.3);
+        z-index: 1;
+        left: 0;
+    }
+
+    .overview {
+        top: 0;
+        height: 100%;
+        background: rgba(255,255,255,0.02);
+    }
+
+    .buildup, .low-block {
+        top: 66.6%;
+        height: 33.4%;
+    }
+
+    .progression, .mid-block {
+        top: 33.3%;
+        height: 33.4%;
+    }
+
+    .final-third, .high-press {
+        top: 0;
+        height: 33.4%;
+    }
+
+    .player-icon {
+        position: absolute;
+        transform: translate(-50%, 50%);
+        z-index: 10;
+        transition: all 0.7s;
+    }
+
+        .player-icon:hover {
+            z-index: 9999 !important;
+        }
+
+    .player-circle {
+        width: 34px;
+        height: 34px;
+        background: #00d2ff;
+        color: #0f172a;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 0.65rem !important;
+        border: 2px solid #fff;
+        cursor: help;
+    }
+
+    .danger .player-circle {
+        background: #ff4d4d;
+    }
+
+    .player-pos-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: white;
+        text-align: center;
+        margin-top: 1px;
+        text-shadow: 1px 1px 2px #000;
+    }
+
+    .player-instruction-overlay {
+        position: absolute;
+        bottom: 42px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 220px;
+        background: #0f172a;
+        border: 1px solid #00d2ff;
+        border-radius: 8px;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.2s;
+        z-index: 10000;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        pointer-events: auto;
+    }
+
+    .player-icon:hover .player-instruction-overlay {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .player-icon.flip-overlay .player-instruction-overlay {
+        bottom: auto;
+        top: 42px;
+    }
+
+    .player-icon.shift-right .player-instruction-overlay {
+        left: 0;
+        transform: translateX(30px);
+    }
+
+    .player-icon.shift-left .player-instruction-overlay {
+        left: auto;
+        right: 0;
+        transform: translateX(-30px);
+    }
+
+    .instr-list li {
+        color: #cbd5e1;
+        font-size: 0.9rem;
+        padding: 10px 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        list-style: none;
+    }
+
+    .instructions-panel {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .instruction-scroll-area {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+        .instruction-scroll-area::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .instruction-scroll-area::-webkit-scrollbar-thumb {
+            background: #00d2ff;
+        }
+
+    .instruction-grid-three-col {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+
+    .instruction-card-compact {
+        background: #0f172a;
+        padding: 10px;
+        border-radius: 6px;
+    }
+
+    .border-left-cyan {
+        border-left: 3px solid #00d2ff;
+    }
+
+    .border-left-danger {
+        border-left: 3px solid #ff4d4d;
+    }
+
+    .instruction-card-compact .label {
+        font-size: 0.65rem;
+        color: #64748b;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .instruction-card-compact .value {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #f8fafc;
+    }
+
+    .highlight-tested-team-active {
+        --bs-table-bg: #d66b49 !important;
+    }
+
+        .highlight-tested-team-active td, .highlight-tested-team-active .text-emerald, .highlight-tested-team-active .text-danger, .highlight-tested-team-active .text-indigo {
+            color: #0f172a !important;
+            font-weight: 900 !important;
+        }
+
+    .results-container {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .test-tab-btn {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #94a3b8;
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: 0.3s;
+        margin: 0 4px;
+        border: none;
+    }
+
+        .test-tab-btn.active {
+            background: #fbbf24;
+            color: #0f172a;
+            border-color: #fbbf24;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+        }
+
+    .custom-fm-table {
+        font-size: 1.15rem;
+        border-collapse: separate;
+        border-spacing: 0 6px;
+        width: 100%;
+        margin: 0;
+    }
+
+        .custom-fm-table thead th {
+            border: none;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            padding: 15px 10px;
+        }
+
+        .custom-fm-table tbody tr {
+            background: rgba(15, 23, 42, 0.4);
+        }
+
+    .btn-download-glow {
+        background: #00d2ff;
+        color: #0f172a;
+        font-weight: 900;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1.15rem;
+        transition: 0.3s;
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+    }
+
+    .category-side {
+        width: 180px;
+        background: rgba(0,0,0,0.15);
+        display: flex;
+        flex-direction: column;
+        border-radius: 0 12px 12px 0;
+    }
+
+    .cat-item {
+        background: transparent;
+        padding: 10px;
+        color: #94a3b8;
+        font-size: 1rem;
+        text-align: left;
+        border: none;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .cat-item.active {
+            color: #00d2ff;
+            background: rgba(0,210,255,0.05);
+        }
+
+    .cat-indicator {
+        width: 4px;
+        height: 14px;
+        background: #334155;
+    }
+
+    .cat-item.active .cat-indicator {
+        background: #00d2ff;
+    }
+</style>

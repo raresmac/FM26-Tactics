@@ -1,0 +1,123 @@
+﻿@page "/{FormationName}"
+@using FM26_Tactics.Models
+@using FM26_Tactics.Services
+@inject TacticService TacticService
+@inject NavigationManager NavManager
+
+<PageTitle>@FormationName Tactics - FM26 Hub</PageTitle>
+
+<div class="container mt-5">
+    <div class="header-container mb-5 p-4 rounded-4 shadow-sm" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+        <div class="d-flex align-items-center">
+            <div class="formation-icon-large me-4">@FormationName</div>
+            <div>
+                <h1 class="fw-black mb-0 text-uppercase tracking-tighter display-4">ELITE <span class="text-cyan">TACTICS</span></h1>
+                <p style="color: #94a3b8; font-size: 1.1rem; margin-top: 5px;">Browsing setups for the <span class="text-white fw-bold">@FormationName</span> formation.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var tactic in TacticService.GetTacticsByFormation(FormationName))
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="tactic-card" @onclick='() => NavManager.NavigateTo($"/{FormationName}/{tactic.Slug}")' style="cursor:pointer">
+                    <div class="tactic-image-container">
+                        <img src="@tactic.ImagePath" alt="@tactic.Title" class="tactic-img" />
+                    </div>
+                    <div class="tactic-body">
+                        <h3 class="tactic-title">@tactic.Title</h3>
+                        <p class="tactic-text">@tactic.Description</p>
+                        <div class="tactic-footer">
+                            <span class="badge bg-dark border border-secondary">FM26 Official</span>
+                            <span class="view-link" style="color: #00d2ff; font-weight: 700;">View Details →</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string FormationName { get; set; }
+
+    // This now pulls directly from your Service!
+    private List<Tactic> FilteredTactics => TacticService.GetTacticsByFormation(FormationName);
+
+    private void NavigateToTactic(string slug)
+    {
+        NavManager.NavigateTo($"/{FormationName}/{slug}");
+    }
+}
+
+<style>
+    .text-cyan {
+        color: #00d2ff;
+    }
+
+    .formation-icon-large {
+        background: #00d2ff;
+        color: #0f172a;
+        padding: 15px 25px;
+        border-radius: 15px;
+        font-weight: 900;
+        font-size: 2rem;
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+    }
+
+    .tactic-card {
+        background: #1e293b;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        overflow: hidden;
+        transition: 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .tactic-card:hover {
+            transform: translateY(-10px);
+            border-color: #00d2ff;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+    .tactic-image-container {
+        height: 200px;
+        overflow: hidden;
+        border-bottom: 2px solid #00d2ff;
+    }
+
+    .tactic-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .tactic-body {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tactic-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #f8fafc;
+    }
+
+    .tactic-text {
+        font-size: 1rem;
+        color: #94a3b8;
+        margin-bottom: 1.5rem;
+    }
+
+    .tactic-footer {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>

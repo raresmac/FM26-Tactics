@@ -1,16 +1,131 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@using FM26_Tactics
+
+<div class="app-wrapper">
+    <!-- Top Modern Navbar -->
+    <nav class="navbar-custom">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="navbar-brand-custom" onclick="window.location.href='/'" style="cursor:pointer">
+                <span class="brand-fm">FM26</span><span class="brand-hub">TACTICS</span>
+            </div>
+
+            <div class="nav-links d-none d-md-flex">
+                <a href="/" class="nav-item-custom active">Formations</a>
+                @* <a href="#" class="nav-item-custom">Guides</a>
+                <a href="#" class="nav-item-custom">Submit Tactic</a> *@
+            </div>
+
+            <div class="user-profile">
+                <div class="status-indicator"></div>
+                <span class="d-none d-sm-inline">Manager Console</span>
+            </div>
+        </div>
+    </nav>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
+        <article class="content">
             @Body
         </article>
     </main>
+
+    <footer class="footer-custom">
+        <div class="container text-center">
+            <p>&copy; 2025 FM26 Tactics Hub - Not affiliated with Sports Interactive.</p>
+        </div>
+    </footer>
 </div>
+
+<style>
+    /* Global Background & Typography */
+    :global(body) {
+        background-color: #0f172a !important; /* Deep Slate Blue */
+        color: #f8fafc;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        margin: 0;
+    }
+
+    .app-wrapper {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Slick Top Navbar */
+    .navbar-custom {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .brand-fm {
+        font-weight: 900;
+        font-size: 1.5rem;
+        letter-spacing: -1px;
+        color: #f8fafc;
+    }
+
+    .brand-hub {
+        font-weight: 300;
+        font-size: 1.5rem;
+        color: #00d2ff;
+        margin-left: 2px;
+    }
+
+    .nav-links {
+        gap: 2rem;
+    }
+
+    .nav-item-custom {
+        color: #94a3b8;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: color 0.3s;
+    }
+
+        .nav-item-custom:hover, .nav-item-custom.active {
+            color: #00d2ff;
+        }
+
+    /* Manager Status Branding */
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #00d2ff;
+        background: rgba(0, 210, 255, 0.1);
+        padding: 6px 15px;
+        border-radius: 30px;
+        border: 1px solid rgba(0, 210, 255, 0.2);
+    }
+
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: #22c55e;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #22c55e;
+    }
+
+    /* Content Area */
+    .content {
+        flex: 1;
+    }
+
+    /* Footer */
+    .footer-custom {
+        padding: 3rem 0;
+        margin-top: 4rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+</style>

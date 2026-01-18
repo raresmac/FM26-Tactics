@@ -17,6 +17,14 @@
 	<RepositoryUrl>https://github.com/raresmac/FM26-Tactics</RepositoryUrl>
 	<PackageProjectUrl>https://github.com/raresmac/FM26-Tactics</PackageProjectUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Models\Formation.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\images\3-4-3\jacket.jpg" />
+  </ItemGroup>
 	
   <ItemGroup>
     <PackageReference Include="Bit.BlazorUI" Version="10.3.0" />

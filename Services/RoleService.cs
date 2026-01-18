@@ -1,0 +1,90 @@
+﻿namespace FM26_Tactics.Services;
+
+public static class RoleService
+{
+    private static readonly Dictionary<(string, bool), string> RoleMap = new()
+    {
+        // In-Possession (true)
+        { ("GK", true), "Goalkeeper" },
+        { ("BGK", true), "Ball-Playing Goalkeeper" },
+        { ("NGK", true), "No-Nonsense Goalkeeper" },
+        { ("FB", true), "Full Back" },
+        { ("WB", true), "Wing Back" },
+        { ("IWB", true), "Inside Wing-Back" },
+        { ("IFB", true), "Inside Full-Back" },
+        { ("PWB", true), "Playmaking Wing-Back" },
+        { ("CB", true), "Centre-Back" },
+        { ("ACB", true), "Advanced Centre-Back" },
+        { ("BCB", true), "Ball-Playing Centre-Back" },
+        { ("NCB", true), "No-Nonsense Center-Back" },
+        { ("WCB", true), "Wide Center-Back" },
+        { ("OCB", true), "Overlapping Centre-Back" },
+        { ("AWB", true), "Advanced Wing-Back" },
+        { ("DM", true), "Defensive Midfielder" },
+        { ("DLP", true), "Deep-Lying Playmaker" },
+        { ("HB", true), "Half Back" },
+        { ("WMF", true), "Wide Midfielder" },
+        { ("W", true), "Winger" },
+        { ("PW", true), "Playmaking Winger" },
+        { ("IW", true), "Inside Winger" },
+        { ("CM", true), "Central Midfielder" },
+        { ("AM", true), "Attacking Midfielder" },
+        { ("AP", true), "Advanced Playmaker" },
+        { ("WCM", true), "Wide Central Midfielder" },
+        { ("CHM", true), "Channel Midfielder" },
+        { ("MPM", true), "Midfielder Playmaker" },
+        { ("IF", true), "Inside Forward" },
+        { ("WFD", true), "Wide Forward" },
+        { ("FR", true), "Free Role" },
+        { ("SS", true), "Second Striker" },
+        { ("DLF", true), "Deep-Lying Forward" },
+        { ("CFD", true), "Centre Forward" },
+        { ("TF", true), "Target Forward" },
+        { ("P", true), "Poacher" },
+        { ("CHF", true), "Channel Forward" },
+        { ("F9", true), "False Nine" },
+
+        // Out-of-Possession (false)
+        { ("GK", false), "Goalkeeper" },
+        { ("SK", false), "Sweeper Goalkeeper" },
+        { ("LHK", false), "Line-Holding Goalkeeper" },
+        { ("FB", false), "Full Back" },
+        { ("PFB", false), "Pressing Full-Back" },
+        { ("HFB", false), "Holding Full-Back" },
+        { ("CB", false), "Centre-Back" },
+        { ("SCB", false), "Stopping Centre-Back" },
+        { ("CCB", false), "Covering Centre-Back" },
+        { ("WCB", false), "Wide Center-Back" },
+        { ("SWD", false), "Stopping Wide Center-Back" },
+        { ("CWD", false), "Covering Wide Centre-Back" },
+        { ("WB", false), "Wing Back" },
+        { ("PWB", false), "Pressing Wing-Back" },
+        { ("HWB", false), "Holding Wing-Back" },
+        { ("DM", false), "Defensive Midfielder" },
+        { ("DDM", false), "Dropping Defensive Midfielder" },
+        { ("PDM", false), "Pressing Defensive Midfielder" },
+        { ("SDM", false), "Screening Defensive Midfielder" },
+        { ("WDM", false), "Wide Covering Defensive Midfielder" },
+        { ("WMF", false), "Wide Midfielder" },
+        { ("TWM", false), "Tracking Wide Midfielder" },
+        { ("OWM", false), "Wide Outlet Wide Midfielder" },
+        { ("CM", false), "Central Midfielder" },
+        { ("PCM", false), "Pressing Central Midfielder" },
+        { ("SCM", false), "Screening Central Midfielder" },
+        { ("W", false), "Winger" },
+        { ("TW", false), "Tracking Winger" },
+        { ("IOW", false), "Inside Outlet Winger" },
+        { ("WOW", false), "Wide Outlet Winger" },
+        { ("AM", false), "Attacking Midfielder" },
+        { ("TAM", false), "Tracking Attacking Midfielder" },
+        { ("OAM", false), "Central Outlet Attacking Midfielder" },
+        { ("CFD", false), "Centre Forward" },
+        { ("TCF", false), "Tracking Centre Forward" },
+        { ("OCF", false), "Central Outlet Centre Forward" }
+    };
+
+    public static string GetFullName(string abbr, bool isInPossession)
+    {
+        return RoleMap.TryGetValue((abbr, isInPossession), out var fullName) ? fullName : abbr;
+    }
+}
