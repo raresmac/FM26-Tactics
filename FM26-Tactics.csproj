@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+		<EmulateStaticFilesFromBasePath>true</EmulateStaticFilesFromBasePath>
+		<GHPages>true</GHPages>
+		<RepositoryType>git</RepositoryType>
+		<Version>0.4.0</Version>
+		<Authors>raresmac</Authors>
+		<Description>The best tactics for FM26, all original and never before seen.</Description>
+		<Company>raresmac</Company>
+		<Product>FM26-Tactics</Product>
+		<Copyright>Copyright (c) 2026 raresmac</Copyright>
+		<RepositoryUrl>https://github.com/raresmac/FM26-Tactics</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/raresmac/FM26-Tactics</PackageProjectUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="Models\Formation.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="wwwroot\images\3-4-3\jacket.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.1" PrivateAssets="all" />
+	</ItemGroup>
+
+</Project>
