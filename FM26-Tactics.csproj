@@ -5,17 +5,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
-		<EmulateStaticFilesFromBasePath>true</EmulateStaticFilesFromBasePath>
-		<GHPages>true</GHPages>
-		<RepositoryType>git</RepositoryType>
-		<Version>0.4.0</Version>
-		<Authors>raresmac</Authors>
-		<Description>The best tactics for FM26, all original and never before seen.</Description>
-		<Company>raresmac</Company>
-		<Product>FM26-Tactics</Product>
-		<Copyright>Copyright (c) 2026 raresmac</Copyright>
-		<RepositoryUrl>https://github.com/raresmac/FM26-Tactics</RepositoryUrl>
-		<PackageProjectUrl>https://github.com/raresmac/FM26-Tactics</PackageProjectUrl>
+		<BlazorEnableCompression>false</BlazorEnableCompression>
+		<BlazorCacheBootResources>false</BlazorCacheBootResources>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -27,8 +18,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.1" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.2" PrivateAssets="all" />
 	</ItemGroup>
 
 </Project>
